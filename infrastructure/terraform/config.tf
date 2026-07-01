@@ -118,18 +118,18 @@ resource "aws_s3_bucket_policy" "config" {
     Version = "2012-10-17"
     Statement = [
       {
-        Sid    = "AWSConfigBucketPermissionsCheck"
-        Effect = "Allow"
+        Sid       = "AWSConfigBucketPermissionsCheck"
+        Effect    = "Allow"
         Principal = { Service = "config.amazonaws.com" }
-        Action   = "s3:GetBucketAcl"
-        Resource = "arn:aws:s3:::${aws_s3_bucket.config.bucket}"
+        Action    = "s3:GetBucketAcl"
+        Resource  = "arn:aws:s3:::${aws_s3_bucket.config.bucket}"
       },
       {
-        Sid    = "AWSConfigBucketDelivery"
-        Effect = "Allow"
+        Sid       = "AWSConfigBucketDelivery"
+        Effect    = "Allow"
         Principal = { Service = "config.amazonaws.com" }
-        Action   = "s3:PutObject"
-        Resource = "arn:aws:s3:::${aws_s3_bucket.config.bucket}/AWSLogs/${data.aws_caller_identity.current.account_id}/Config/*"
+        Action    = "s3:PutObject"
+        Resource  = "arn:aws:s3:::${aws_s3_bucket.config.bucket}/AWSLogs/${data.aws_caller_identity.current.account_id}/Config/*"
         Condition = {
           StringEquals = { "s3:x-amz-acl" = "bucket-owner-full-control" }
         }
