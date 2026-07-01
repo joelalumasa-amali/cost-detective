@@ -46,6 +46,10 @@ resource type.
 
 ![Elastic IP identified as unassociated](docs/Screenshot%202026-05-29%20124920.png)
 
+![EC2 console in eu-west-1 listing the running t3.large idle instance alongside two t3.micro instances](docs/screenshots/Screenshot%202026-07-01%20161241.png)
+
+![garbage_collect.py dry run output listing an unattached EBS volume, an unassociated Elastic IP, and an idle t3.large instance with a ~$69.39/mo estimated savings summary](docs/screenshots/Screenshot%202026-07-01%20165901.png)
+
 ---
 
 ### Objective 2 — Implement Cost Governance
@@ -73,6 +77,10 @@ Budgets.
 
 ![AWS Config rule showing Noncompliant EC2 instance](docs/Screenshot%202026-05-29%20141305.png)
 
+![AWS Config Rules page showing require-costcenter-tag-ec2 and require-costcenter-tag-s3, each with 1 Noncompliant resource](docs/screenshots/Screenshot%202026-07-01%20165958.png)
+
+![AWS Budget alert detail page showing the three staged thresholds: 50% forecasted ($25), 80% forecasted ($40), and 100% actual ($50), all Not exceeded](docs/screenshots/Screenshot%202026-07-01%20170544.png)
+
 ---
 
 ### Objective 3 — Architect a Cost-Optimised Solution
@@ -92,6 +100,10 @@ savings while maintaining availability.
 ![Auto Scaling Group with Mixed Instances Policy](docs/Screenshot%202026-05-29%20142523.png)
 
 ![Launch template with Spot configuration](docs/Screenshot%202026-05-29%20144404.png)
+
+![Auto Scaling groups list showing cost-detective-asg at 2/2 healthy instances across two Availability Zones](docs/screenshots/Screenshot%202026-07-01%20161313.png)
+
+![cost-detective-asg detail view showing the Mixed Instances Policy: t3.micro/t3.small instance types, 1 On-Demand base instance, and 25% On-Demand / 75% Spot distribution above base](docs/screenshots/Screenshot%202026-07-01%20165734.png)
 
 ---
 
@@ -154,3 +166,5 @@ pull request:
 - `tflint` — Terraform linting
 - `flake8` — Python style check
 - `pytest` — unit tests
+
+![GitHub Actions code-quality run passing with a green checkmark after fixing tflint warnings](docs/screenshots/Screenshot%202026-07-01%20160454.png)
