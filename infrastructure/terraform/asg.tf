@@ -13,6 +13,18 @@ resource "aws_launch_template" "main" {
   image_id      = data.aws_ami.amazon_linux.id
   instance_type = "t3.micro"
 
+  block_device_mappings {
+    device_name = "/dev/xvda"
+
+    ebs {
+      encrypted = true
+    }
+  }
+
+  metadata_options {
+    http_tokens = "required"
+  }
+
   tag_specifications {
     resource_type = "instance"
     tags = {

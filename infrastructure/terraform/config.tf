@@ -3,7 +3,17 @@ resource "aws_config_configuration_recorder" "main" {
   role_arn = aws_iam_role.config.arn
 
   recording_group {
-    all_supported = true
+    all_supported                 = false
+    include_global_resource_types = false
+    resource_types = [
+      "AWS::EC2::Instance",
+      "AWS::EC2::Volume",
+      "AWS::EC2::EIP",
+      "AWS::S3::Bucket",
+      "AWS::RDS::DBInstance",
+      "AWS::IAM::User",
+      "AWS::IAM::Role",
+    ]
   }
 }
 
@@ -58,6 +68,44 @@ resource "aws_config_config_rule" "require_cost_center_tag" {
 
   scope {
     compliance_resource_types = ["AWS::EC2::Instance"]
+  }
+
+  depends_on = [aws_config_configuration_recorder_status.main]
+}
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "config" {
+  bucket = aws_s3_bucket.config.id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
+    }
+  }
+}
+
+resource "aws_s3_bucket_public_access_block" "config" {
+  bucket = aws_s3_bucket.config.id
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+resource "aws_config_config_rule" "require_cost_center_tag_s3" {
+  name = "require-costcenter-tag-s3"
+
+  source {
+    owner             = "AWS"
+    source_identifier = "REQUIRED_TAGS"
+  }
+
+  input_parameters = jsonencode({
+    tag1Key = "CostCenter"
+  })
+
+  scope {
+    compliance_resource_types = ["AWS::S3::Bucket"]
   }
 
   depends_on = [aws_config_configuration_recorder_status.main]
