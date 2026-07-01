@@ -1,0 +1,59 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  code-quality:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Python dependencies
+        run: pip install flake8 pytest boto3
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "~1.9"
+
+      - name: Cache Terraform providers
+        uses: actions/cache@v4
+        with:
+          path: infrastructure/terraform/.terraform
+          key: terraform-${{ hashFiles('infrastructure/terraform/.terraform.lock.hcl') }}
+
+      - name: Install tflint
+        run: |
+          curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
+
+      - name: Terraform fmt check
+        working-directory: infrastructure/terraform
+        run: terraform fmt -check -recursive .
+
+      - name: Terraform init
+        working-directory: infrastructure/terraform
+        run: terraform init -backend=false
+
+      - name: Terraform validate
+        working-directory: infrastructure/terraform
+        run: terraform validate
+
+      - name: tflint
+        working-directory: infrastructure/terraform
+        run: tflint
+
+      - name: flake8
+        run: flake8 scripts/ --max-line-length=120
+
+      - name: pytest
+        run: pytest scripts/test_garbage_collect.py -v
